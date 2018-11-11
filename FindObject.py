@@ -6,8 +6,8 @@ methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
             'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
 
 # Read the images from the file
-small_image = cv2.imread('small.png')
-large_image = cv2.imread('Lolprint.png')
+small_image = cv2.imread('files/small.png')
+large_image = cv2.imread('files/big.png')
 
 result = cv2.matchTemplate(small_image, large_image, cv2.TM_SQDIFF_NORMED)
 
