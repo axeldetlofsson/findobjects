@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 #from cv2 import cv
 
 #method = CV_TM_SQDIFF_NORMED
@@ -6,26 +7,33 @@ methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
             'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
 
 # Read the images from the file
-small_image = cv2.imread('files/small.png')
-large_image = cv2.imread('files/big.png')
+small_image = cv2.imread('files/small.png', cv2.IMREAD_GRAYSCALE)
+#large_image = cv2.imread('files/big.png')
 
-result = cv2.matchTemplate(small_image, large_image, cv2.TM_SQDIFF_NORMED)
 
-# We want the minimum squared difference
-mn,_,mnLoc,_ = cv2.minMaxLoc(result)
+cap = cv2.VideoCapture("files/lolvid.mp4")
+w, h = small_image.shape[::-1]
 
-# Draw the rectangle:
-# Extract the coordinates of our best match
-MPx,MPy = mnLoc
+while True:
+    ret, frame = cap.read()
 
-# Step 2: Get the size of the template. This is the same size as the match.
-trows,tcols = small_image.shape[:2]
+    if not ret is False:
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    else:
+        break
 
-# Step 3: Draw the rectangle on large_image
-cv2.rectangle(large_image, (MPx,MPy),(MPx+tcols,MPy+trows),(0,0,255),2)
+    res = cv2.matchTemplate(gray_frame, small_image, cv2.TM_CCOEFF_NORMED)
+    loc = np.where(res >= 0.7)
 
-# Display the original image with the rectangle around the match.
-cv2.imshow('output',large_image)
+    for pt in zip(*loc[::-1]):
+        cv2.rectangle(frame, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 3)
 
-# The image is only displayed if we call this
-cv2.waitKey(0)
+    cv2.imshow("Frame", frame)
+
+    key = cv2.waitKey(1)
+
+    if key == 27:
+        break
+
+cap.release()
+cv2.destroyAllWindows()
